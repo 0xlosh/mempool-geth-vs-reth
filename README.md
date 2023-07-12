@@ -1,5 +1,3 @@
-# mempool-geth-vs-reth
-
 yellow = geth win\
 red = reth win
 
