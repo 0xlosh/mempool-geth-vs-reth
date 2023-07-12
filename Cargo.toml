@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libx = { git = "file:///home/code-base/libx", branch = "v1.0.0" }
 eyre = { version = "0.6.8" }
 
 # error handling

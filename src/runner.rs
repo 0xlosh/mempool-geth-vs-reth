@@ -3,7 +3,6 @@ use eyre::Result;
 use tracing::{debug, info};
 use console::style;
 use ethers::prelude::*;
-use libx::prelude::*;
 
 pub async fn execute(ctx: crate::cli::Ctx) -> Result<()> {
     debug!("{:?}", ctx);
@@ -11,8 +10,8 @@ pub async fn execute(ctx: crate::cli::Ctx) -> Result<()> {
     let handle = tokio::runtime::Handle::current();
     debug!("{:?}", handle.runtime_flavor());
 
-    let geth = Provider::new(HWI::connect("/data/geth/geth.ipc").await?);
-    let reth = Provider::new(HWI::connect("/data/reth/reth.ipc").await?);
+    let geth = Provider::new(Ipc::connect("/data/geth/geth.ipc").await?);
+    let reth = Provider::new(Ipc::connect("/data/reth/reth.ipc").await?);
 
     assert_eq!(
         geth.get_block_number().await?,
