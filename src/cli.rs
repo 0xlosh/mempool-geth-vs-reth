@@ -5,62 +5,47 @@ use clap::{
     Args, 
     Parser, 
 };
-use ethers::types::Chain;
-use crate::runner;
+use ethers::prelude::*;
+use crate::{runner, hwi::*};
 
 pub async fn run() -> Result<()> {
-    let mut opt = Cli::parse();
-    opt.ctx.init()?;
+    let opt = Cli::parse();
 
     tracing_subscriber::fmt()
         .with_max_level(opt.verbosity.level())
         .without_time()
         .init();
 
-    runner::execute(opt.ctx).await
+    let geth_url = opt.geth_rpc.as_ref().unwrap();
+    if geth_url.starts_with("http") {
+        return Err(eyre::eyre!("geth rpc must be ws or ipc"));
+    }
+
+    let reth_url = opt.reth_rpc.as_ref().unwrap();
+    if reth_url.starts_with("http") {
+        return Err(eyre::eyre!("reth rpc must be ws or ipc"));
+    }
+
+    let geth = Provider::new(HWI::connect(geth_url).await?);
+    let reth = Provider::new(HWI::connect(reth_url).await?);
+    
+    runner::execute(geth, reth, opt.count).await
 }
 
 #[derive(Debug, Parser)]
 #[command(author, version = env!("CARGO_PKG_VERSION"), long_about = None)]
 struct Cli {
-    #[clap(flatten)]
-    ctx: Ctx,
+    #[clap(long, global = true, default_value = "ws://127.0.0.1:8546", help = "http/ws/ipc path")]
+    pub geth_rpc: Option<String>,
+
+    #[clap(long, global = true, default_value = "ws://127.0.0.1:9546", help = "http/ws/ipc path")]
+    pub reth_rpc: Option<String>,
     
+    #[clap(long, default_value_t = 50, help = "number of transactions to watch")]
+    pub count: usize,
+
     #[clap(flatten)]
     verbosity: Verbosity,
-}
-
-#[derive(Debug, Clone, Args)]
-#[command()]
-pub struct Ctx {
-    #[clap(long, short = 'f', default_value_t = Chain::Mainnet, global = true, conflicts_with = "rpc")]
-    network: Chain,
-
-    #[clap(long, global = true, conflicts_with = "network")]
-    pub rpc: Option<String>,
-
-    #[clap(long= "gasprice", alias = "gp", global = true)]
-    pub gasprice: Option<String>,
-
-    #[clap(long= "gas", global = true)]
-    pub gas: Option<u64>,
-}
-
-impl Ctx {
-    fn init(&mut self) -> Result<()> {
-        if self.rpc.is_none() {
-            let rpc = match self.network {
-                Chain::Mainnet => "/data/geth/geth.ipc",
-                Chain::Arbitrum => "/data/arbitrum/arb1/arb.ipc",
-
-                _ => return Err(eyre::eyre!("no default rpc for {:?}", self.network)),
-            };
-
-            self.rpc = Some(rpc.to_string());
-        }
-
-        Ok(())
-    }
 }
 
 /// The verbosity settings for the cli.

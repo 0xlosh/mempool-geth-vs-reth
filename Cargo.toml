@@ -18,14 +18,17 @@ ethers = { version = "2.0.7", features = ["rustls", "ws", "ipc"]  }
 tokio = { version = "1.28.2", features = ["macros", "rt-multi-thread"] }
 tokio-rustls = { version = "0.24.1" }
 
+# async 
+async-trait = "0.1.68"
+
 # misc
 serde = { version = "1.0" }
 serde_json = { version = "1.0" }
 serde_derive = { version = "1.0.160" }
 rustc-hex = { version = "2.1.0" }
-dotenv = "0.15.0"
 clap = { version = "4.3.2", features = ["derive"] }
 console = "0.15.7"
+url = "2.4.0"
 
 # logging
 tracing = { version = "0.1.37" }

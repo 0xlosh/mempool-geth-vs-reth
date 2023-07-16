@@ -3,15 +3,11 @@ use eyre::Result;
 use tracing::{debug, info};
 use console::style;
 use ethers::prelude::*;
+use crate::hwi::*;
 
-pub async fn execute(ctx: crate::cli::Ctx) -> Result<()> {
-    debug!("{:?}", ctx);
-
+pub async fn execute(geth: Provider<HWI>, reth: Provider<HWI>, count: usize) -> Result<()> {
     let handle = tokio::runtime::Handle::current();
     debug!("{:?}", handle.runtime_flavor());
-
-    let geth = Provider::new(Ipc::connect("/data/geth/geth.ipc").await?);
-    let reth = Provider::new(Ipc::connect("/data/reth/reth.ipc").await?);
 
     assert_eq!(
         geth.get_block_number().await?,
@@ -19,7 +15,6 @@ pub async fn execute(ctx: crate::cli::Ctx) -> Result<()> {
     );
 
     let to = "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad".parse::<H160>()?; // uniswap router
-    let count = 100;
 
     let t_geth = tokio::spawn(async move {
         let mut mapping: HashMap<H256, u128> = HashMap::new();
