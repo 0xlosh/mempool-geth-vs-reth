@@ -1,3 +1,7 @@
+```
+./mempool-geth-vs-reth --help
+```
+
 yellow = geth win\
 red = reth win
 
