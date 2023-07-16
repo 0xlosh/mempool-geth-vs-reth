@@ -35,10 +35,10 @@ pub async fn run() -> Result<()> {
 #[derive(Debug, Parser)]
 #[command(author, version = env!("CARGO_PKG_VERSION"), long_about = None)]
 struct Cli {
-    #[clap(long, global = true, default_value = "ws://127.0.0.1:8546", help = "http/ws/ipc path")]
+    #[clap(long, global = true, default_value = "ws://127.0.0.1:8546", help = "ws/ipc path")]
     pub geth_rpc: Option<String>,
 
-    #[clap(long, global = true, default_value = "ws://127.0.0.1:9546", help = "http/ws/ipc path")]
+    #[clap(long, global = true, default_value = "ws://127.0.0.1:9546", help = "ws/ipc path")]
     pub reth_rpc: Option<String>,
     
     #[clap(long, default_value_t = 50, help = "number of transactions to watch")]
